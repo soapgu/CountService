@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.soapgu.service">
+
+    <application>
+        <service
+            android:name=".MyCountService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.soapgu.core.intent.action.COUNT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

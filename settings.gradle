@@ -1,0 +1,4 @@
+rootProject.name = "CountService"
+include ':app'
+include ':core'
+include ':service'
