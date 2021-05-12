@@ -6,6 +6,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.orhanobut.logger.Logger;
+import com.soapgu.core.Broadcasts;
 import com.soapgu.core.ICounter;
 
 import java.util.concurrent.TimeUnit;
@@ -50,7 +51,10 @@ public class MyCountService extends Service {
     private void StartCountEngine() {
         disposables.add(
                 Observable.interval( 3 , TimeUnit.SECONDS )
-                        .subscribe( t -> countValue = t ,
+                        .subscribe( t -> {
+                                    countValue = t;
+                                    sendBroadcast(new Intent(Broadcasts.First));
+                                } ,
                                 e -> Logger.e( e, "On Error" ),
                                 ()-> Logger.i("Stop Engine"))
         );
