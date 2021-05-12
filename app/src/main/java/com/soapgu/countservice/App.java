@@ -8,7 +8,6 @@ import com.orhanobut.logger.FormatStrategy;
 import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
 import com.soapgu.core.Intents;
-import com.soapgu.service.MyCountService;
 
 public class App extends Application {
     @Override

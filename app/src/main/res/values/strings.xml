@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CountService</string>
+    <string name="GetCount">Get Count</string>
 </resources>

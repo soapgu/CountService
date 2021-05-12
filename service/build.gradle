@@ -33,6 +33,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
     implementation "com.google.android.material:material:$rootProject.materialVersion"
     implementation "com.orhanobut:logger:$rootProject.loggerVersion"
+    implementation "io.reactivex.rxjava3:rxandroid:$rootProject.rxAndroidVersion"
+    implementation "io.reactivex.rxjava3:rxjava:$rootProject.rxJavaVersion"
     implementation project(path: ':core')
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$rootProject.testExtJunit"
