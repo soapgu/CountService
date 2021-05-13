@@ -53,6 +53,7 @@ public class MyCountService extends Service {
                 Observable.interval( 3 , TimeUnit.SECONDS )
                         .subscribe( t -> {
                                     countValue = t;
+                                    Logger.i( "<<<<<Sent Broadcasts" );
                                     sendBroadcast(new Intent(Broadcasts.First));
                                 } ,
                                 e -> Logger.e( e, "On Error" ),
