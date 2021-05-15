@@ -1,20 +1,19 @@
 package com.soapgu.countservice;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.orhanobut.logger.Logger;
-import com.soapgu.core.Broadcasts;
+import com.soapgu.core.CountListener;
 import com.soapgu.core.ICounter;
 import com.soapgu.core.Intents;
 import com.soapgu.countservice.databinding.ActivityMainBinding;
@@ -31,12 +30,20 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {//第二个参数就是服务中的onBind方法的返回值
             Logger.i( "-----onServiceConnected----" );
             iService = (ICounter) service;
+            iService.addListener( listener );
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Logger.w( "-----onServiceDisconnected----" );
             //add commit
+        }
+    };
+
+    private final CountListener listener = new CountListener() {
+        @Override
+        public void onCount(Long count) {
+            viewModel.setMessage( String.format( "Count:%s",count ) );
         }
     };
 
@@ -54,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        setupBroadcast();
         super.onResume();
     }
 
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(broadcastReceiver);
+        iService.removeListener( listener );
         unbindService(conn);
         iService = null;
     }
@@ -78,17 +84,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    private void setupBroadcast() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Broadcasts.First);
-        registerReceiver((broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Logger.i("onReceive Broadcast>>>>>>");
-                viewModel.setMessage( String.format( "Count:%s",iService.getCount() ) );
-            }
-        }), filter);
     }
 }

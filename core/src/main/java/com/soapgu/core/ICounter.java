@@ -9,4 +9,8 @@ public interface ICounter {
      * @return 计数值
      */
     Long getCount();
+
+    void addListener( CountListener listener );
+
+    void removeListener( CountListener listener );
 }

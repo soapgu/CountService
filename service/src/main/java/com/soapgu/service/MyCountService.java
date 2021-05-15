@@ -6,9 +6,12 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.orhanobut.logger.Logger;
-import com.soapgu.core.Broadcasts;
+import com.soapgu.core.CountListener;
 import com.soapgu.core.ICounter;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -18,6 +21,9 @@ public class MyCountService extends Service {
 
     private Long countValue;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private final MyBinder binder = new MyBinder();
+    private final List<WeakReference<CountListener>> listeners = new CopyOnWriteArrayList<>();
+
 
     public MyCountService() {
     }
@@ -25,7 +31,7 @@ public class MyCountService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Logger.i( "------MyCountService onBind-------" );
-        return new MyBinder();
+        return binder;
     }
 
     @Override
@@ -54,7 +60,15 @@ public class MyCountService extends Service {
                         .subscribe( t -> {
                                     countValue = t;
                                     Logger.i( "<<<<<Sent Broadcasts" );
-                                    sendBroadcast(new Intent(Broadcasts.First));
+                                    if( !listeners.isEmpty() ) {
+                                        listeners.removeIf(w -> w.get() == null);
+                                        if( !listeners.isEmpty() )
+                                            listeners.forEach(w -> {
+                                                CountListener listener = w.get();
+                                                if( listener != null )
+                                                    listener.onCount( t );
+                                            });
+                                    }
                                 } ,
                                 e -> Logger.e( e, "On Error" ),
                                 ()-> Logger.i("Stop Engine"))
@@ -67,6 +81,16 @@ public class MyCountService extends Service {
         @Override
         public Long getCount() {
             return countValue;
+        }
+
+        @Override
+        public void addListener(CountListener listener) {
+            listeners.add( new WeakReference<>(listener) );
+        }
+
+        @Override
+        public void removeListener(CountListener listener) {
+            listeners.removeIf( w-> w.get() == listener );
         }
     }
 }
