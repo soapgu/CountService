@@ -5,8 +5,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import androidx.core.util.Consumer;
+
 import com.orhanobut.logger.Logger;
-import com.soapgu.core.CountListener;
 import com.soapgu.core.ICounter;
 
 import java.lang.ref.WeakReference;
@@ -22,7 +23,7 @@ public class MyCountService extends Service {
     private Long countValue;
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final MyBinder binder = new MyBinder();
-    private final List<WeakReference<CountListener>> listeners = new CopyOnWriteArrayList<>();
+    private final List<WeakReference<Consumer<Long>>> listeners = new CopyOnWriteArrayList<>();
 
 
     public MyCountService() {
@@ -64,9 +65,9 @@ public class MyCountService extends Service {
                                         listeners.removeIf(w -> w.get() == null);
                                         if( !listeners.isEmpty() )
                                             listeners.forEach(w -> {
-                                                CountListener listener = w.get();
+                                                Consumer<Long> listener = w.get();
                                                 if( listener != null )
-                                                    listener.onCount( t );
+                                                    listener.accept( t );
                                             });
                                     }
                                 } ,
@@ -84,12 +85,12 @@ public class MyCountService extends Service {
         }
 
         @Override
-        public void addListener(CountListener listener) {
+        public void addListener(Consumer<Long> listener) {
             listeners.add( new WeakReference<>(listener) );
         }
 
         @Override
-        public void removeListener(CountListener listener) {
+        public void removeListener(Consumer<Long> listener) {
             listeners.removeIf( w-> w.get() == listener );
         }
     }
